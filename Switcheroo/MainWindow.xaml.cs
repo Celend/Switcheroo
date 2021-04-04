@@ -81,8 +81,6 @@ namespace Switcheroo
 
             SetUpAltTabHook();
 
-            CheckForUpdates();
-
             Theme.SuscribeWindow(this);
 
             Theme.LoadTheme();
@@ -263,8 +261,6 @@ namespace Switcheroo
 
             var sortAZMenuItem = new MenuItem("Alpha&betical Sort", (s, e) => sortAZMenuItem_Click(s as MenuItem));
 
-            var exportToJSON_MenuItem = new MenuItem("Export to &Json", (s, e) => exportToJSON_MenuItem_Click(s as MenuItem));
-
             _notifyIcon = new NotifyIcon
             {
                 Text = "Switcheroo",
@@ -275,7 +271,6 @@ namespace Switcheroo
                     new MenuItem("&Options", (s, e) => Options()),
                     runOnStartupMenuItem,
                     sortAZMenuItem,
-                    exportToJSON_MenuItem,
                     new MenuItem("&About", (s, e) => About()),
                     new MenuItem("E&xit", (s, e) => Quit())
                 })
@@ -318,90 +313,6 @@ namespace Switcheroo
             }
         }
 
-        private static void CheckForUpdates()
-        {
-            var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
-            if (currentVersion == new Version(0, 0, 0, 0))
-            {
-                return;
-            }
-
-            var timer = new DispatcherTimer();
-
-            timer.Tick += async (sender, args) =>
-            {
-                timer.Stop();
-                var latestVersion = await GetLatestVersion();
-                if (latestVersion != null && latestVersion > currentVersion)
-                {
-                    var result = MessageBox.Show(
-                        string.Format(
-                            "Switcheroo v{0} is available (you have v{1}).\r\n\r\nDo you want to download it?",
-                            latestVersion, currentVersion),
-                        "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        Process.Start("https://github.com/kvakulo/Switcheroo/releases/latest");
-                    }
-                }
-                else
-                {
-                    timer.Interval = new TimeSpan(24, 0, 0);
-                    timer.Start();
-                }
-            };
-
-            timer.Interval = new TimeSpan(0, 0, 0);
-            timer.Start();
-        }
-
-        private static async Task<Version> GetLatestVersion()
-        {
-            try
-            {
-                var versionAsString =
-                    await
-                        new WebClient().DownloadStringTaskAsync(
-                            "https://raw.github.com/kvakulo/Switcheroo/update/version.txt");
-                Version newVersion;
-                if (Version.TryParse(versionAsString, out newVersion))
-                {
-                    return newVersion;
-                }
-            }
-            catch (WebException)
-            {
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Export JSON of currently running windows.
-        /// JSON Structure: arrays of window titles are grouped under unique process names which are sorted alphabetically.
-        /// </summary>
-        private void ExportToJSON()
-        {
-            _unfilteredWindowList = new WindowFinder().GetWindows().Select(window => new AppWindowViewModel(window)).ToList();
-            _unfilteredWindowList = _unfilteredWindowList.OrderBy(x => x.ProcessTitle).ToList();
-
-            var winsDict = _unfilteredWindowList.GroupBy(x => x.ProcessTitle).ToDictionary(x => x.Key, x => x.Select(y => y.WindowTitle));
-
-            string JSON_output = JsonConvert.SerializeObject(winsDict);
-
-            SaveFileDialog SaveFileDialog1 = new SaveFileDialog();
-            SaveFileDialog1.Title = "Save list to";
-            SaveFileDialog1.DefaultExt = "txt";
-            SaveFileDialog1.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            SaveFileDialog1.ShowDialog();
-
-            if (SaveFileDialog1.FileName != "")
-            {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@SaveFileDialog1.FileName, false))
-                {
-                    file.Write(JSON_output);
-                }
-            }
-        }
 
         /// <summary>
         /// Populates the window list with the current running windows.
@@ -593,14 +504,6 @@ namespace Switcheroo
         {
             Toggle_sortWinList();
             menuItem.Checked = _sortWinList;
-        }
-
-        /// <summary>
-        /// Context menu "Export to Json"
-        /// </summary>
-        private void exportToJSON_MenuItem_Click(MenuItem menuItem)
-        {
-            ExportToJSON();
         }
 
         #endregion
