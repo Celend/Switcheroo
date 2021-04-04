@@ -1,24 +1,21 @@
 <img src="logo.png" alt="Switcheroo" width="48px" height="48px"> Switcheroo + mods
 ==========
 
-This is my modded version of [Switcheroo](https://github.com/kvakulo/Switcheroo) branched after the maintainer became unresponsive.
-It is distributed as-is with no warranty or guarantees whatsoever. Your patches are welcome.
+Switcheroo is for anyone who spends more time using a keyboard than a mouse. Instead of alt-tabbing through a (long) list of open windows, Switcheroo allows you to quickly switch to any window by typing in just a few characters of its title.
 
 Download
 --------
 
-Grab the binaries **[here](https://github.com/elig0n/Switcheroo/releases)**
+Grab the binaries **[here](https://github.com/Celend/Switcheroo/releases)**
 
 Custom Features
 -------
+- *Direct search* - `Alt+Tab` and holding `Alt` then type text to search, release `Alt` to switch.
 - *Numerical quick access* - Alt+digit for easy switching to any of the first 10 applications (also hinted on-screen).
 - *Light/Dark Theme*
 - *Sort* list by process name or title via tray icon menu or shortcut keys in-live list
 - *Tray* icon single click open, extended context menu actions.
-- Windows list context menu *actions*: close, run, clone instance (duplicate), bring to front
 - Home/End/PageUp/PageDown *keys* navigation in the list
-- VIM-like navigation *keys* Alt+j Alt+k. Alt+Up/down is working now too for when you opened the application with alt+ shortcut pressed down.
-- Export list to JSON
 
 *Planned:*
 -------
@@ -35,14 +32,7 @@ Activate Switcheroo            | `Alt + Space`   | This shortcut can be customiz
 Activate Switcheroo            | `Alt + Tab`     | Only works if enabled under _Options_
 _When Switcheroo is open_      |                 |
 Switch to selected window      | `Enter`,`Alt`   |
-Select next/previous           | `Tab`/`Shift + Tab`, `Alt + J`/`Alt + K` | 
+Select next/previous           | `Tab`/`Shift + Tab`, `Up arrow`/`Down arrow` | 
 Selection jumps                | `Home`, `End`, `PageUp`, `PageDown`| First, Last, Page up, Page down
 Switch to n-th window          | `Alt + 1..0`    | For first ten on the list. 0 for tenth.
-Close selected window          | `Ctrl + W`,`Alt + X`|
-Options                        | `Alt + O`       |
-Toggle sort by process name    | `Alt + S`       |
 Dismiss Switcheroo             | `Esc`           |
-
-Discord
-------
-Please join our [Discord channel](https://discord.gg/8zMj7fz) for further discussions.
