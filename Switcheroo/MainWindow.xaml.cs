@@ -67,12 +67,13 @@ namespace Switcheroo
         private SystemWindow _foregroundWindow;
         private bool _altTabAutoSwitch;
         private bool _sortWinList = false;
+        private bool _searchEnabled = false;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            SetUpKeyBindings();
+            SetUpKeyBindings(); 
 
             SetUpNotifyIcon();
 
@@ -100,9 +101,17 @@ namespace Switcheroo
             // Enter and Esc bindings are not executed before the keys have been released.
             // This is done to prevent that the window being focused after the key presses
             // to get 'KeyUp' messages.
-
+            
+            var keys = new Key[] {
+                Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P,
+                Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.I, Key.J, Key.K, Key.L,
+                Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M
+            };
+            var alphabet = new HashSet<Key>(keys);
+           
             KeyDown += (sender, args) =>
             {
+                System.Diagnostics.Debug.WriteLine("key: " + args.Key);
                 // Opacity is set to 0 right away so it appears that action has been taken right away...
                 if (args.Key == Key.Enter && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
                 {
@@ -112,31 +121,31 @@ namespace Switcheroo
                 {
                     Opacity = 0;
                 }
-                else if (args.SystemKey == Key.O)
+                else if (alphabet.Contains(args.SystemKey) && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
                 {
-                    Options();
+                    if (!this._searchEnabled)
+                    {
+                        this._searchEnabled = true;
+                        this.tb.Text = "";
+                        tb.IsEnabled = true;
+                        tb.Focus();
+                    }
+            
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                    {
+                        this.tb.Text += args.SystemKey.ToString();
+                    } else
+                    {
+                        this.tb.Text += args.SystemKey.ToString().ToLower();
+                    }
+                    this.tb.SelectionStart = this.tb.Text.Length;
+                    this.tb.SelectionLength = 0;
                 }
-                else if (args.SystemKey == Key.W)
-                {
-                    ExportToJSON();
-                }
-                else if (args.SystemKey == Key.Q && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
-                {
-                    _altTabAutoSwitch = false;
-                    tb.Text = "";
-                    tb.IsEnabled = true;
-                    tb.Focus();
-                }
-                else if (args.SystemKey == Key.S && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
-                {
-                    Toggle_sortWinList();
-                    LoadData(InitialFocus.NextItem);
-                }
-                else if ((args.SystemKey == Key.Up || args.SystemKey == Key.K) && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+                else if (args.SystemKey == Key.Up)
                 {
                     PreviousItem();
                 }
-                else if ((args.SystemKey == Key.Down || args.SystemKey == Key.J) && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+                else if (args.SystemKey == Key.Down)
                 {
                     NextItem();
                 }
@@ -669,7 +678,8 @@ namespace Switcheroo
                 {
                     _altTabAutoSwitch = true;
                     tb.IsEnabled = false;
-                    tb.Text = "Press Alt + Q to search";
+                    _searchEnabled = false;
+                    tb.Text = "Type to search (hold alt)";
                 }
 
                 Opacity = 1;
